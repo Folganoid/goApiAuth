@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS users(
     email VARCHAR UNIQUE NOT NULL,
     hash_password VARCHAR NOT NULL,
     register_at timestamp not null,
-    role INT not null,
-    notice varchar
+    role_id INT not null references roles(id),
+    notice varchar DEFAULT ''
 );

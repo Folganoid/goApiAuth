@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS roles(
+    id int PRIMARY KEY UNIQUE NOT NULL,
+    name VARCHAR UNIQUE NOT NULL,
+    level INT NOT NULL,
+    notice VARCHAR UNIQUE NOT NULL
+);
+
+insert into roles(id, name, level, notice)
+values
+        (1, 'admin', 1, 'the highest'),
+        (2, 'moderator', 2, 'high'),
+        (5, 'user', 5, 'casual'),
+        (10, 'guest', 10, 'low');
