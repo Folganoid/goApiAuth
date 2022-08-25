@@ -11,6 +11,18 @@ run:
 
 .DEFAULT_GOAL := run
 
+migrations_up:
+	@echo "  >  migrations up..."
+	/home/fg/tmp/migrate/./migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable" up
+
+.DEFAULT_GOAL := migrations_up
+
+migrations_down:
+	@echo "  >  migrations down..."
+	/home/fg/tmp/migrate/./migrate -path migrations -database "postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable" down
+
+.DEFAULT_GOAL := migrations_up
+
 .PHONY: test
 test:
 	@echo "  >  Test..."

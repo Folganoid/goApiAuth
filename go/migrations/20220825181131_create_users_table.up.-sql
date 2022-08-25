@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS users(
+    id serial PRIMARY KEY UNIQUE NOT NULL,
+    username VARCHAR UNIQUE NOT NULL,
+    email VARCHAR UNIQUE NOT NULL,
+    hash_password VARCHAR NOT NULL,
+    register_at timestamp not null,
+    role INT not null,
+    notice varchar
+);

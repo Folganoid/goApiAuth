@@ -1,12 +1,12 @@
 version: "3.9"
 services:
 
-  go:
-    build: ./go
-    ports:
-      - "8080:8080"
-    networks:
-      - some-net
+#  go:
+#    build: ./go
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - some-net
 
   postgres:
     image: postgres:13

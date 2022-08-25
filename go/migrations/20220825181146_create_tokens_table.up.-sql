@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS tokens(
+    id serial PRIMARY KEY UNIQUE NOT NULL,
+    user_id INT NOT NULL references users(id),
+    token VARCHAR UNIQUE NOT NULL,
+    created_at timestamp not null,
+    expired_at timestamp not null
+);
