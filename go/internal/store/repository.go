@@ -3,7 +3,7 @@ package store
 import "goApiAuth/go/internal/models"
 
 type UserRepository interface {
-	Create(user *models.User) (*models.User, error)
+	Create(user *models.User) error
 	GetById(id int) (*models.User, error)
 	GetByEmail(email string) (*models.User, error)
 }
@@ -13,4 +13,8 @@ type TokenRepository interface {
 	CheckToken(token string) (bool, error)
 	DeleteByToken(token string) error
 	DeleteByUserId(userId int) error
+}
+
+type RoleRepository interface {
+	GetById(id int) (models.Role, error)
 }

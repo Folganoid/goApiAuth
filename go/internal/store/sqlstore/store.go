@@ -10,6 +10,7 @@ type Store struct {
 	db *sql.DB
 	userRepository *UserRepository
 	tokenRepository *TokenRepository
+	roleRepository *RoleRepository
 }
 
 func New(db *sql.DB) *Store {
@@ -38,4 +39,15 @@ func (s *Store) Token() store.TokenRepository {
 	}
 
 	return s.tokenRepository
+}
+
+func (s *Store) Role() store.RoleRepository {
+	if s.roleRepository != nil {
+		return s.roleRepository
+	}
+	s.roleRepository = &RoleRepository{
+		store: s,
+	}
+
+	return s.roleRepository
 }

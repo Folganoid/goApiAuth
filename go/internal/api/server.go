@@ -29,12 +29,23 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (s *server) configureRouter() {
 	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
 	s.router.HandleFunc("/test", s.handleTest()).Methods("GET")
+
+	//user
+	s.router.HandleFunc("/user", s.handleUsersCreate()).Methods("POST")
+	s.router.HandleFunc("/user/id/{id}", s.handleUserGetById()).Methods("GET")
+	s.router.HandleFunc("/user/email/{email}", s.handleUserGetByEmail()).Methods("GET")
+
+	//role
+	s.router.HandleFunc("/role/{id}", s.handleRoleGet()).Methods("GET")
 }
 
-func (s *server) handleTest() http.HandlerFunc {
+func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
+	s.respond(w, r, code, map[string]string{"error": err.Error()})
+}
 
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode("Ok")
+func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
+	w.WriteHeader(code)
+	if data != nil {
+		json.NewEncoder(w).Encode(data)
 	}
 }
