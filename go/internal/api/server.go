@@ -33,7 +33,8 @@ func (s *server) configureRouter() {
 	//user
 	s.router.HandleFunc("/user", s.handleUsersCreate()).Methods("POST")
 	s.router.HandleFunc("/user/id/{id}", s.handleUserGetById()).Methods("GET")
-	s.router.HandleFunc("/user/email/{email}", s.handleUserGetByEmail()).Methods("GET")
+	s.router.HandleFunc("/user/id/{id}", s.handleUserUpdate()).Methods("PUT")
+	s.router.HandleFunc("/user/id/{id}", s.handleUserDelete()).Methods("DELETE")
 
 	//role
 	s.router.HandleFunc("/role/{id}", s.handleRoleGet()).Methods("GET")

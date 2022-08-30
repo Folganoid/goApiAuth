@@ -30,6 +30,16 @@ func (u *User) BeforeCreate() error {
 	return nil
 }
 
+func (u *User) BeforeUpdate() error {
+	if len(u.Password) > 0 {
+		u.HashPassword = GetMD5Hash(u.Password)
+	}
+	u.Password = ""
+	u.Notice = "new user"
+
+	return nil
+}
+
 func GetMD5Hash(text string) string {
 	hash := md5.Sum([]byte(text))
 	return hex.EncodeToString(hash[:])
