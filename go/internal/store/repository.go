@@ -10,10 +10,8 @@ type UserRepository interface {
 }
 
 type TokenRepository interface {
-	Create(token *models.Token) (*models.Token, error)
-	CheckToken(token string) (bool, error)
-	DeleteByToken(token string) error
-	DeleteByUserId(userId int) error
+	Create(token string) (*models.Token, error)
+	Check(token string) (*models.Token, error)
 }
 
 type RoleRepository interface {
