@@ -47,12 +47,7 @@ func (s *server) handleUserGetById() http.HandlerFunc {
 
 		params := mux.Vars(r)
 		id := params["id"]
-		idInt, err := strconv.Atoi(id)
-
-		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
+		idInt, _ := strconv.Atoi(id)
 
 		role, err := s.store.User().GetById(idInt)
 		if err != nil {
@@ -71,19 +66,14 @@ func (s *server) handleUserDelete() http.HandlerFunc {
 
 		params := mux.Vars(r)
 		id := params["id"]
-		idInt, err := strconv.Atoi(id)
-
-		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
+		idInt, _ := strconv.Atoi(id)
 
 		if id == "" || idInt == 0 {
 			s.error(w, r, http.StatusBadRequest, errors.New("bad id"))
 			return
 		}
 
-		err = s.store.User().Delete(idInt)
+		err := s.store.User().Delete(idInt)
 		if err != nil {
 			s.error(w, r, http.StatusNotFound, err)
 			return
@@ -107,12 +97,7 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 
 		params := mux.Vars(r)
 		id := params["id"]
-		idInt, err := strconv.Atoi(id)
-
-		if err != nil {
-			s.error(w, r, http.StatusBadRequest, err)
-			return
-		}
+		idInt, _ := strconv.Atoi(id)
 
 		if id == "" || idInt == 0 {
 			s.error(w, r, http.StatusBadRequest, errors.New("bad id"))
@@ -130,8 +115,9 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 			s.error(w, r, http.StatusBadRequest, err)
 			return
 		}
+
 		if u.Username == "" {
-			s.error(w, r, http.StatusBadRequest, err)
+			s.error(w, r, http.StatusBadRequest, errors.New("User not found"))
 			return
 		}
 
@@ -144,6 +130,7 @@ func (s *server) handleUserUpdate() http.HandlerFunc {
 			s.error(w, r, http.StatusUnprocessableEntity, err)
 			return
 		}
+
 		u.HashPassword = ""
 		s.respond(w,r,http.StatusOK, u)
 

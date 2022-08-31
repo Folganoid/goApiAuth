@@ -36,6 +36,8 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/user/id/{id}", s.handleUserUpdate()).Methods("PUT")
 	s.router.HandleFunc("/user/id/{id}", s.handleUserDelete()).Methods("DELETE")
 
+	//token
+	s.router.HandleFunc("/token", s.handleTokenCreate()).Methods("POST")
 	//role
 	s.router.HandleFunc("/role/{id}", s.handleRoleGet()).Methods("GET")
 }

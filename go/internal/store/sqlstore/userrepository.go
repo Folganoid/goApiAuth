@@ -84,7 +84,6 @@ func (r *UserRepository) Update(user *models.User) error {
 			return err
 		}
 	user.Role = role
-	user.Notice = "updated user"
 
 	res, err := r.store.db.Exec(`
 		UPDATE users 
@@ -110,6 +109,21 @@ func (r *UserRepository) Update(user *models.User) error {
 	}
 
 	return nil
+}
+
+func (r *UserRepository) GetByLoginPass(username, pass string) (models.User, error) {
+
+	user := models.User{Username: username, Password: pass}
+	user.HashPassword = models.GetMD5Hash(pass)
+	user.Password = ""
+	r.store.db.QueryRow(`SELECT id, username, email, register_at, role_id, notice FROM users WHERE username=$1 and hash_password=$2`, user.Username, user.HashPassword).
+		Scan(&user.ID, &user.Username, &user.Email, &user.RegisterAt, &user.Role.ID, &user.Notice)
+
+	if user.Email == "" {
+		return user, errors.New("Can not define user")
+	}
+
+	return user, nil
 }
 
 

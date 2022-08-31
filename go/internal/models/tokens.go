@@ -1,9 +1,27 @@
 package models
 
+import (
+	"math/rand"
+	"strings"
+	"time"
+)
+
 type Token struct {
 	ID 					int 		`json:"id"`
 	User				User 		`json:"user"`
 	Token 				string 		`json:"token"`
-	CreatedAt			int			`json:"created_at"`
-	ExpiredAt			int			`json:"expired_at"`
+	CreatedAt			time.Time	`json:"created_at"`
+	ExpiredAt			time.Time	`json:"expired_at"`
+}
+
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func RandomString(n int) string {
+	rand.Seed(time.Now().UnixNano())
+	sb := strings.Builder{}
+	sb.Grow(n)
+	for i := 0; i < n; i++ {
+		sb.WriteByte(charset[rand.Intn(len(charset))])
+	}
+	return sb.String()
 }

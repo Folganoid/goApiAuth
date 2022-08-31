@@ -7,10 +7,11 @@ type UserRepository interface {
 	GetById(id int) (*models.User, error)
 	Delete(id int) error
 	Update(user *models.User) error
+	GetByLoginPass(username, pass string) (models.User, error)
 }
 
 type TokenRepository interface {
-	Create(token string) (*models.Token, error)
+	Create(token *models.Token) error
 	Check(token string) (*models.Token, error)
 }
 
