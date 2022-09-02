@@ -38,6 +38,8 @@ func (s *server) configureRouter() {
 
 	//token
 	s.router.HandleFunc("/token", s.handleTokenCreate()).Methods("POST")
+	s.router.HandleFunc("/token/{token}", s.handleTokenCheck()).Methods("GET")
+
 	//role
 	s.router.HandleFunc("/role/{id}", s.handleRoleGet()).Methods("GET")
 }

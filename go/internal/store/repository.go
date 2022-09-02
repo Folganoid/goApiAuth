@@ -12,7 +12,7 @@ type UserRepository interface {
 
 type TokenRepository interface {
 	Create(token *models.Token) error
-	Check(token string) (*models.Token, error)
+	Check(tokenStr string) (*models.Token, error)
 }
 
 type RoleRepository interface {

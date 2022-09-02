@@ -12,6 +12,7 @@ type Token struct {
 	Token 				string 		`json:"token"`
 	CreatedAt			time.Time	`json:"created_at"`
 	ExpiredAt			time.Time	`json:"expired_at"`
+	IsValid				bool		`json:"is_valid"`
 }
 
 const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
