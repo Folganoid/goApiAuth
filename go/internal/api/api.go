@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"goApiAuth/go/internal/store/sqlstore"
 	"net/http"
+	"os"
 )
 
 func Start(config *Config) error {
@@ -14,8 +15,14 @@ func Start(config *Config) error {
 	}
 	defer db.Close()
 
+	logFile, err := os.OpenFile(config.LogFile, os.O_WRONLY | os.O_CREATE, 0755)
+	if err != nil {
+		return err
+	}
+	defer logFile.Close()
+
 	store := sqlstore.New(db)
-	srv := newServer(store)
+	srv := newServer(store, logFile)
 
 	return http.ListenAndServe(config.BindAddr, srv)
 }

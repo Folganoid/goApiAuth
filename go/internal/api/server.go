@@ -5,20 +5,27 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"goApiAuth/go/internal/store"
+	log "github.com/sirupsen/logrus"
 	"net/http"
+	"os"
+	"time"
 )
 
 type server struct {
 	router *mux.Router
 	store store.Store
+	logger *log.Logger
 }
 
-func newServer(store store.Store) *server {
+func newServer(store store.Store, logFile *os.File) *server {
 	s := &server {
 		router: mux.NewRouter(),
 		store: store,
+		logger: log.New(),
 	}
+
 	s.configureRouter()
+	s.configureLogger(logFile)
 	return s
 }
 
@@ -27,6 +34,8 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) configureRouter() {
+
+	s.router.Use(s.logRequest)
 	s.router.Use(handlers.CORS(handlers.AllowedOrigins([]string{"*"})))
 	s.router.HandleFunc("/test", s.handleTest()).Methods("GET")
 
@@ -42,6 +51,43 @@ func (s *server) configureRouter() {
 
 	//role
 	s.router.HandleFunc("/role/{id}", s.handleRoleGet()).Methods("GET")
+
+	s.logger.Info("API started")
+}
+
+func (s *server) configureLogger(logFile *os.File) {
+	s.logger.SetFormatter(&log.JSONFormatter{})
+	s.logger.SetOutput(logFile)
+	s.logger.SetLevel(log.DebugLevel)
+}
+
+func (s *server) logRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger := s.logger.WithFields(log.Fields{
+			"remote_addr": r.RemoteAddr,
+		})
+		logger.Infof("started %s %s", r.Method, r.RequestURI)
+
+		rw := &responseWriter{w, http.StatusOK}
+		next.ServeHTTP(rw, r)
+
+		var level log.Level
+		switch {
+		case rw.code >= 500:
+			level = log.ErrorLevel
+		case rw.code >= 400:
+			level = log.WarnLevel
+		default:
+			level = log.InfoLevel
+		}
+		logger.Logf(
+			level,
+			"completed with %d %s in %v",
+			rw.code,
+			http.StatusText(rw.code),
+			time.Now().String(),
+		)
+	})
 }
 
 func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err error) {
