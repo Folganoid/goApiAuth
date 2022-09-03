@@ -4,6 +4,7 @@ type Config struct {
 	BindAddr string `toml:"bind_addr"`
 	DatabaseURL string `toml:"database_url"`
 	LogFile string `toml:"log_file"`
+	LogLevel string `toml:"log_level"`
 }
 
 func NewConfig() *Config {

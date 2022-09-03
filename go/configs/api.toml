@@ -1,3 +1,4 @@
 bind_addr = ":8080"
 database_url = "user=postgres password=postgres host=localhost dbname=postgres sslmode=disable"
 log_file = "./logrus.log"
+log_level = "debug"

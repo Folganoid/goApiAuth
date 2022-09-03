@@ -7,7 +7,6 @@ import (
 	"goApiAuth/go/internal/store"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -17,15 +16,14 @@ type server struct {
 	logger *log.Logger
 }
 
-func newServer(store store.Store, logFile *os.File) *server {
+func newServer(store store.Store, logger *log.Logger) *server {
 	s := &server {
 		router: mux.NewRouter(),
 		store: store,
-		logger: log.New(),
+		logger: logger,
 	}
 
 	s.configureRouter()
-	s.configureLogger(logFile)
 	return s
 }
 
@@ -53,12 +51,6 @@ func (s *server) configureRouter() {
 	s.router.HandleFunc("/role/{id}", s.handleRoleGet()).Methods("GET")
 
 	s.logger.Info("API started")
-}
-
-func (s *server) configureLogger(logFile *os.File) {
-	s.logger.SetFormatter(&log.JSONFormatter{})
-	s.logger.SetOutput(logFile)
-	s.logger.SetLevel(log.DebugLevel)
 }
 
 func (s *server) logRequest(next http.Handler) http.Handler {
@@ -96,6 +88,7 @@ func (s *server) error(w http.ResponseWriter, r *http.Request, code int, err err
 
 func (s *server) respond(w http.ResponseWriter, r *http.Request, code int, data interface{}) {
 	w.WriteHeader(code)
+	s.logger.Debugf("response body: %v", data)
 	if data != nil {
 		json.NewEncoder(w).Encode(data)
 	}

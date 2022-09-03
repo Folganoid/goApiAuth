@@ -21,8 +21,10 @@ func Start(config *Config) error {
 	}
 	defer logFile.Close()
 
-	store := sqlstore.New(db)
-	srv := newServer(store, logFile)
+	logger, _ := NewLogger(logFile, config.LogLevel)
+
+	store := sqlstore.New(db, logger)
+	srv := newServer(store, logger)
 
 	return http.ListenAndServe(config.BindAddr, srv)
 }

@@ -22,10 +22,13 @@ func (r *UserRepository) Create(user *models.User) error {
 
 	user.Role = role
 
-	return r.store.db.QueryRow(
-		`INSERT INTO users(username, email, hash_password, register_at, role_id, notice) 
+	query := `INSERT INTO users(username, email, hash_password, register_at, role_id, notice) 
 			VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
-		`,
+		`
+
+	r.store.LogSql(query, user.Username, user.Email, user.HashPassword, user.RegisterAt, user.Role.ID, user.Notice)
+
+	return r.store.db.QueryRow(query,
 		user.Username,
 		user.Email,
 		user.HashPassword,
@@ -39,7 +42,10 @@ func (r *UserRepository) Create(user *models.User) error {
 func (r *UserRepository) GetById(id int) (*models.User, error) {
 
 	user := &models.User{ID: id}
-	r.store.db.QueryRow(`SELECT username, email, register_at, role_id, notice FROM users WHERE id=$1`, id).Scan(&user.Username, &user.Email, &user.RegisterAt, &user.Role.ID, &user.Notice)
+
+	req := `SELECT username, email, register_at, role_id, notice FROM users WHERE id=$1`
+	r.store.LogSql(req, id)
+	r.store.db.QueryRow(req, id).Scan(&user.Username, &user.Email, &user.RegisterAt, &user.Role.ID, &user.Notice)
 
 	if user.Email == "" {
 		return nil, errors.New("Can not define user")
@@ -57,7 +63,9 @@ func (r *UserRepository) GetById(id int) (*models.User, error) {
 
 func (r *UserRepository) Delete(id int) error {
 
-	res, err := r.store.db.Exec(`DELETE FROM users WHERE id=$1`, id)
+	req := `DELETE FROM users WHERE id=$1`
+	r.store.LogSql(req, id)
+	res, err := r.store.db.Exec(req, id)
 	if err != nil {
 		return err
 	}
@@ -85,7 +93,7 @@ func (r *UserRepository) Update(user *models.User) error {
 		}
 	user.Role = role
 
-	res, err := r.store.db.Exec(`
+	req := `
 		UPDATE users 
 		SET username = $2,
 		    email = $3,
@@ -93,7 +101,10 @@ func (r *UserRepository) Update(user *models.User) error {
 		    role_id = $5, 
 		    notice = $6
 		WHERE id = $1;
-		`, user.ID, user.Username, user.Email, user.HashPassword, user.Role.ID, user.Notice)
+		`
+	r.store.LogSql(req, user.ID, user.Username, user.Email, user.HashPassword, user.Role.ID, user.Notice)
+
+	res, err := r.store.db.Exec(req, user.ID, user.Username, user.Email, user.HashPassword, user.Role.ID, user.Notice)
 
 	if err != nil {
 		return err
@@ -116,6 +127,10 @@ func (r *UserRepository) GetByLoginPass(username, pass string) (models.User, err
 	user := models.User{Username: username, Password: pass}
 	user.HashPassword = models.GetMD5Hash(pass)
 	user.Password = ""
+
+	req := `SELECT id, username, email, register_at, role_id, notice FROM users WHERE username=$1 and hash_password=$2`
+	r.store.LogSql(req, user.Username, user.HashPassword)
+
 	r.store.db.QueryRow(`SELECT id, username, email, register_at, role_id, notice FROM users WHERE username=$1 and hash_password=$2`, user.Username, user.HashPassword).
 		Scan(&user.ID, &user.Username, &user.Email, &user.RegisterAt, &user.Role.ID, &user.Notice)
 
